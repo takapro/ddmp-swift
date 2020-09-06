@@ -21,9 +21,10 @@ func unfold<State: Hashable, Event>(_ process: (State) -> [(Event, State)], _ in
 func printDot<State: Hashable, Event>(_ graph: Graph<State, Event>) {
     print("digraph {")
     var indexOf = [State: Int]()
-    for (index, (state, _)) in graph.enumerated() {
+    for (index, (state, transitions)) in graph.enumerated() {
         indexOf[state] = index
-        print("  \(index) [label=\"\(state)\"];")
+        let attr = transitions.isEmpty ? ",color=red,style=filled" : ""
+        print("  \(index) [label=\"\(state)\"\(attr)];")
     }
     for (from, transitions) in graph {
         for (event, to) in transitions {

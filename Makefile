@@ -1,10 +1,19 @@
-ALL = inOut
+ALL = inOut incr
 LIB = ddmp.swift main.swift
+
+.PHONY: all clean
+.PRECIOUS: %.dot
 
 all: $(ALL)
 
-inOut: inOut.swift $(LIB)
+%: %.swift $(LIB)
 	swiftc $^ -o $@
 
+%.dot: %
+	./$< > $@
+
+%.png: %.dot
+	dot -T png $< -o $@
+
 clean:
-	rm -f $(ALL)
+	rm -f $(ALL) *.dot *.png
