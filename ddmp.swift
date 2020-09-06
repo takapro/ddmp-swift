@@ -1,54 +1,9 @@
 //　Deadlock detector in Swift
 
-enum Range: Int, CaseIterable, CustomDebugStringConvertible {
-    case v1 = 1, v2, v3
+typealias Graph<State: Hashable, Event> = [(State, [(Event, State)])]
 
-    var debugDescription: String {
-        return "\(self.rawValue)"
-    }
-}
-
-enum Event: Equatable, CustomDebugStringConvertible {
-    case In(_ value: Range)
-    case Out(_ value: Range)
-
-    var debugDescription: String {
-        switch self {
-        case .In(let value):
-            return "In(\(value))"
-        case .Out(let value):
-            return "Out(\(value))"
-        }
-    }
-}
-
-enum State: Hashable, CustomDebugStringConvertible {
-    case S0
-    case S1(_ value: Range)
-
-    var debugDescription: String {
-        switch self {
-        case .S0:
-            return "S0"
-        case .S1(let value):
-            return "S1(\(value))"
-        }
-    }
-}
-
-func process(_ state: State) -> [(Event, State)] {
-    switch state {
-    case .S0:
-        return Range.allCases.map { (.In($0), .S1($0)) }
-    case .S1(let value):
-        return [(.Out(value), .S0)]
-    }
-}
-
-typealias Graph = [(State, [(Event, State)])]
-
-func unfold(_ process: (State) -> [(Event, State)], _ initial: State) -> Graph {
-    var graph = Graph()
+func unfold<State: Hashable, Event>(_ process: (State) -> [(Event, State)], _ initial: State) -> Graph<State, Event> {
+    var graph = Graph<State, Event>()
     var queue = [initial]
     var visited = Set<State>()
     while let state = queue.first {
@@ -63,7 +18,7 @@ func unfold(_ process: (State) -> [(Event, State)], _ initial: State) -> Graph {
     return graph
 }
 
-func printDot(_ graph: Graph) {
+func printDot<State: Hashable, Event>(_ graph: Graph<State, Event>) {
     print("digraph {")
     var indexOf = [State: Int]()
     for (index, (state, _)) in graph.enumerated() {
@@ -77,5 +32,3 @@ func printDot(_ graph: Graph) {
     }
     print("}")
 }
-
-printDot(unfold(process, .S0))
