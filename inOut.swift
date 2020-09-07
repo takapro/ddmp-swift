@@ -22,5 +22,5 @@ func process(_ state: InOutState) -> [(InOutEvent, InOutState)] {
 }
 
 func main() {
-    printDot(unfold(process, .S0))
+    printDot(unfold(.S0, process))
 }

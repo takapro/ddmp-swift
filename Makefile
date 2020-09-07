@@ -14,6 +14,7 @@ all: $(ALL)
 
 %.png: %.dot
 	dot -T png $< -o $@
+	open $@
 
 clean:
 	rm -f $(ALL) *.dot *.png

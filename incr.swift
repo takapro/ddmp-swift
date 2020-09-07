@@ -27,5 +27,5 @@ func process(_ state: IncrState) -> [(IncrEvent, IncrState)] {
 }
 
 func main() {
-    printDot(unfold(process, .S0(1)))
+    printDot(unfold(.S0(1), process))
 }

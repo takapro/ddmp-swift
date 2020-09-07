@@ -1,34 +1,41 @@
 //　Deadlock detector in Swift
 
-typealias Graph<State: Hashable, Event> = [(State, [(Event, State)])]
+typealias Graph<Event, State: Hashable> = [(State, [(Event, State)])]
 
-func unfold<State: Hashable, Event>(_ process: (State) -> [(Event, State)], _ initial: State) -> Graph<State, Event> {
-    var graph = Graph<State, Event>()
+extension Array {
+    func indexOf<Key: Hashable, Value>(_ key: Key) -> Int? where Element == (Key, Value) {
+        return self.firstIndex { $0.0 == key }
+    }
+
+    func valueOf<Key: Hashable, Value>(_ key: Key) -> Value? where Element == (Key, Value) {
+        return self.first { $0.0 == key }?.1
+    }
+}
+
+func unfold<Event, State: Hashable>(_ initial: State, _ process: (State) -> [(Event, State)]) -> Graph<Event, State> {
+    var graph = Graph<Event, State>()
     var queue = [initial]
-    var visited = Set<State>()
     while let state = queue.first {
         queue = Array(queue.dropFirst())
-        if !visited.contains(state) {
+        if graph.indexOf(state) == nil {
             let transitions = process(state)
             graph.append((state, transitions))
-            transitions.forEach { queue.append($0.1) }
-            visited.insert(state)
+            queue.append(contentsOf: transitions.map { $0.1 })
         }
     }
     return graph
 }
 
-func printDot<State: Hashable, Event>(_ graph: Graph<State, Event>) {
+func printDot<Event, State: Hashable>(_ graph: Graph<Event, State>) {
     print("digraph {")
-    var indexOf = [State: Int]()
     for (index, (state, transitions)) in graph.enumerated() {
-        indexOf[state] = index
-        let attr = transitions.isEmpty ? ",color=red,style=filled" : ""
+        let color: String? = transitions.isEmpty ? "pink" : index == 0 ? "cyan" : nil
+        let attr = color != nil ? ",color=\(color!),style=filled" : ""
         print("  \(index) [label=\"\(state)\"\(attr)];")
     }
-    for (from, transitions) in graph {
-        for (event, to) in transitions {
-            print("  \(indexOf[from]!) -> \(indexOf[to]!) [label=\"\(event)\"];")
+    for (index, (_, transitions)) in graph.enumerated() {
+        for (event, state) in transitions {
+            print("  \(index) -> \(graph.indexOf(state)!) [label=\"\(event)\"];")
         }
     }
     print("}")
