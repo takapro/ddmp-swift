@@ -1,4 +1,4 @@
-ALL = inOut incr pq01 pq02 inOutSync
+ALL = inOut incr pq01 pq02 inOutSync incrShm incrMutex
 LIB = ddmp.swift compose.swift main.swift
 
 .PHONY: all clean
