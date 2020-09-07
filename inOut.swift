@@ -15,9 +15,9 @@ enum InOutState: Hashable {
 func process(_ state: InOutState) -> [(InOutEvent, InOutState)] {
     switch state {
     case .S0:
-        return InOutRange.map { (.In($0), .S1($0)) }
+        return InOutRange.map { (.Out($0), .S1($0)) }
     case .S1(let value):
-        return [(.Out(value), .S0)]
+        return [(.In(value), .S0)]
     }
 }
 
